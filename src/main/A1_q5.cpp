@@ -49,9 +49,32 @@ void validate_grid(const std::vector<std::string>& grid) {
 }
 
 std::vector<std::vector<int>> risk(const std::vector<std::string>& grid) {
+    // Reject the whole map first, so an invalid character anywhere prevents any output.
     validate_grid(grid);
-    // Part 1 stops here: the neighbourhood risk matrix is still to be computed.
-    return std::vector<std::vector<int>>();
+    const std::size_t rows = grid.size();
+    if (rows == 0) return std::vector<std::vector<int>>();
+    const std::size_t columns = grid.front().size();
+    // Same dimensions as the input, indexed as [row][column].
+    std::vector<std::vector<int>> result(rows, std::vector<int>(columns, 0));
+    for (std::size_t row = 0; row < rows; ++row) {
+        for (std::size_t column = 0; column < columns; ++column) {
+            // An obstacle is reported as -1 instead of a neighbour count.
+            if (grid[row][column] == '#') {
+                result[row][column] = -1;
+                continue;
+            }
+            int count = 0;
+            // Only the four orthogonal neighbours count; diagonals are excluded,
+            // and positions outside the map are not obstacles, so edges add no risk.
+            if (row > 0 && grid[row - 1][column] == '#') ++count;
+            if (row + 1 < rows && grid[row + 1][column] == '#') ++count;
+            if (column > 0 && grid[row][column - 1] == '#') ++count;
+            if (column + 1 < columns && grid[row][column + 1] == '#') ++count;
+            result[row][column] = count;
+        }
+    }
+    // One pass over the grid, so the running time is O(rows*columns).
+    return result;
 }
 // END IMPLEMENTATION
 }
