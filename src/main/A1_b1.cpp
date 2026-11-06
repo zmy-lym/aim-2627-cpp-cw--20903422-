@@ -18,7 +18,15 @@ namespace aim::b1 {
 
 
 // BEGIN IMPLEMENTATION
-bool parse_i32(const std::string& text, int& output) { throw std::runtime_error("TODO"); }
+bool parse_i32(const std::string& text, int& output) { 
+    if (text.empty()) return false;
+    std::size_t pos = 0;
+    bool negative = false;
+    if (text[pos] == '-' || text[pos] == '+') {
+        negative = text[pos] == '-';
+        ++pos;
+    }
+ }
 // END IMPLEMENTATION
 }
 
