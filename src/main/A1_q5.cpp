@@ -18,7 +18,41 @@ namespace aim::q5 {
 
 
 // BEGIN IMPLEMENTATION
-std::vector<std::vector<int>> risk(const std::vector<std::string>& grid) { throw std::runtime_error("TODO"); }
+namespace {
+
+// Only these two symbols may appear in a row: free space and obstacle.
+bool is_map_symbol(char cell) {
+    return cell == '.' || cell == '#';
+}
+
+}  // namespace
+
+// Validate the whole map before any risk value is produced. A bad character in a
+// later row still rejects the entire map, so no partial matrix is ever returned.
+void validate_grid(const std::vector<std::string>& grid) {
+    // An empty row sequence is a valid, empty map and needs no further checks.
+    if (grid.empty()) return;
+    const std::size_t columns = grid.front().size();
+    // A nonempty map must have at least one column.
+    if (columns == 0) throw std::invalid_argument("map has no columns");
+    for (std::size_t row = 0; row < grid.size(); ++row) {
+        // Every row must have exactly the same length; no padding or truncation.
+        if (grid[row].size() != columns) {
+            throw std::invalid_argument("rows have different lengths");
+        }
+        for (std::size_t column = 0; column < columns; ++column) {
+            if (!is_map_symbol(grid[row][column])) {
+                throw std::invalid_argument("map contains an illegal character");
+            }
+        }
+    }
+}
+
+std::vector<std::vector<int>> risk(const std::vector<std::string>& grid) {
+    validate_grid(grid);
+    // Part 1 stops here: the neighbourhood risk matrix is still to be computed.
+    return std::vector<std::vector<int>>();
+}
 // END IMPLEMENTATION
 }
 
