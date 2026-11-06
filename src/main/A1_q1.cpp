@@ -18,7 +18,11 @@ namespace aim::q1 {
 
 
 // BEGIN IMPLEMENTATION
-long long ratio(long long hp, long long max_hp) { throw std::runtime_error("TODO"); }
+long long ratio(long long hp, long long max_hp) { 
+    if (max_hp <= 0) return -1;
+    long long bounded = std::clamp(hp, 0LL, max_hp);
+    return bounded * 100 / max_hp;
+ }
 std::string report(int id, long long hp, long long max_hp, int battery) { throw std::runtime_error("TODO"); }
 // END IMPLEMENTATION
 }
