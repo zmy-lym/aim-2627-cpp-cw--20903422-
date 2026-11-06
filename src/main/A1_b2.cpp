@@ -18,8 +18,11 @@ namespace aim::b2 {
 
 
 // BEGIN IMPLEMENTATION
-std::size_t compact(int* data, std::size_t n, int low, int high) { 
+std::size_t compact(int* data, std::size_t n, int low, int high) {
+    // Reversed bounds retain nothing and must leave every element untouched.
     if (low > high) return 0;
+    // Single write pointer: data[0..kept-1] holds the retained values in sampling order,
+    // and kept<=i always, so data[i] is read before it can be overwritten.
     std::size_t kept = 0;
     for (std::size_t i = 0; i < n; ++i) {
         if (data[i] >= low && data[i] <= high) {
@@ -28,6 +31,8 @@ std::size_t compact(int* data, std::size_t n, int low, int high) {
         }
     }
     return kept;
+}
+// END IMPLEMENTATION
 }
 
 #define CHECK(...) do { if (!(__VA_ARGS__)) throw std::runtime_error("check failed"); } while(false)
