@@ -23,7 +23,13 @@ long long ratio(long long hp, long long max_hp) {
     long long bounded = std::clamp(hp, 0LL, max_hp);
     return bounded * 100 / max_hp;
  }
-std::string report(int id, long long hp, long long max_hp, int battery) { throw std::runtime_error("TODO"); }
+std::string report(int id, long long hp, long long max_hp, int battery) { 
+    int charge = std::clamp(battery, 0, 100);
+    std::string state = charge >= 60 ? "OK" : (charge >= 20 ? "WARNING" : "LOW");
+    long long percent = ratio(hp, max_hp);
+    std::string hp_text = percent == -1 ? "INVALID" : std::to_string(percent);
+    return "ID=" + std::to_string(id) + ";HP=" + hp_text + ";BAT=" + std::to_string(charge) + ";STATE=" + state;
+ }
 // END IMPLEMENTATION
 }
 
