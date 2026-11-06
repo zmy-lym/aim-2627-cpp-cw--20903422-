@@ -18,27 +18,41 @@ namespace aim::q4 {
 struct CommandResult { long long value; int accepted; int rejected; };
 
 // BEGIN IMPLEMENTATION
-CommandResult execute(const std::vector<std::string>& lines) { 
+CommandResult execute(const std::vector<std::string>& lines) {
     CommandResult result{0, 0, 0};
+    // Both the argument and the proposed result share this inclusive bound.
+    const long long kLimit = 1000000;
     for (const std::string& line : lines) {
         std::istringstream input(line);
-        std::string operation, extra;
+        std::string operation;
+        std::string extra;
         long long argument = 0;
+        // The candidate is staged here and committed only after full validation.
         long long candidate = result.value;
         bool valid = false;
         if (input >> operation) {
             if (operation == "RESET") {
-                if (!(input >> extra)) { candidate = 0; valid = true; }
+                // RESET takes no argument, so any remaining field rejects the line.
+                if (!(input >> extra)) {
+                    candidate = 0;
+                    valid = true;
+                }
             } else if (operation == "ADD" || operation == "SET") {
-                if (input >> argument && !(input >> extra) && argument >= -1000000000 && argument <= 1000000000) {
+                // Exactly one argument, no trailing field, and the argument itself
+                // must already lie inside the range before any arithmetic happens.
+                if (input >> argument && !(input >> extra)
+                    && argument >= -kLimit && argument <= kLimit) {
                     candidate = operation == "ADD" ? result.value + argument : argument;
-                    valid = candidate >= -1000000000 && candidate <= 1000000000;
+                    // The proposed result must also stay inside the same range.
+                    valid = candidate >= -kLimit && candidate <= kLimit;
                 }
             }
         }
+        // Increment the counter that belongs to this line, then keep the invariant
+        // accepted+rejected == lines.size().
         if (valid) {
             result.value = candidate;
-            result.accepted;
+            ++result.accepted;
         } else {
             ++result.rejected;
         }
