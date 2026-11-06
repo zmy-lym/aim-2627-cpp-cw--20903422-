@@ -18,7 +18,33 @@ namespace aim::q7 {
 struct FireResult { int shots; int rejected; int ammo; int heat; };
 
 // BEGIN IMPLEMENTATION
-FireResult simulate(int ammo, int heat, int cool, int shot_heat, const std::vector<int>& requests) { throw std::runtime_error("TODO"); }
+FireResult simulate(int ammo, int heat, int cool, int shot_heat, const std::vector<int>& requests) {
+    // Counters start at zero; ammo and heat carry the caller's initial resources.
+    int shots = 0;
+    int rejected = 0;
+    for (std::size_t i = 0; i < requests.size(); ++i) {
+        // Every frame cools first, so a request is judged against the cooled heat.
+        heat -= cool;
+        if (heat < 0) heat = 0;
+        // A zero request only cools; it never consumes ammunition or counts anywhere.
+        if (requests[i] != 1) continue;
+        // A shot needs a round and must not push heat above 100; equality is allowed.
+        if (ammo > 0 && heat + shot_heat <= 100) {
+            --ammo;
+            heat += shot_heat;
+            ++shots;
+        } else {
+            // Rejection consumes nothing: neither ammunition nor shot heat.
+            ++rejected;
+        }
+    }
+    FireResult result;
+    result.shots = shots;
+    result.rejected = rejected;
+    result.ammo = ammo;
+    result.heat = heat;
+    return result;
+}
 // END IMPLEMENTATION
 }
 
