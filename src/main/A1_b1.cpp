@@ -26,7 +26,19 @@ bool parse_i32(const std::string& text, int& output) {
         negative = text[pos] == '-';
         ++pos;
     }
- }
+    if (pos == text.size()) return false; 
+    const long long limit = negative ? std::numeric_limits<int>::max() : std::numeric_limits<int>::max();
+    long long value = 0;
+    for (; pos < text.size(); ++pos) {
+        char ch = text[pos];
+        if (ch < '0' || ch > '9') return false; 
+        int digit = ch - '0';
+        if (value > (limit - digit) / 10) return false; 
+        value = value * 10 + digit;
+    }
+    output = static_cast<int>(negative ? -value : value);
+    return true;
+ } 
 // END IMPLEMENTATION
 }
 
