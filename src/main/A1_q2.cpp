@@ -19,15 +19,37 @@ struct LabelEdit { std::string from; std::string to; };
 
 // BEGIN IMPLEMENTATION
 std::string edit_labels(std::string labels, const std::vector<LabelEdit>& edits) { 
-for (const LabelEdit& edit : edits) {
-    if (edit.from.empty()) {
-        if (!edit.to.empty()) {
-            if (!labels.empty()) labels += ",";
-            labels += edit.to;
+    for (const LabelEdit& edit : edits) {
+        if (edit.from.empty()) {
+            if (!edit.to.empty()) {
+                if (!labels.empty()) labels += ",";
+                labels += edit.to;
+            }
+            continue;
+        } 
+        std::size_t start = 0;
+        while (start < labels.size()) { 
+            std::size_t end = labels.find(',', start);
+            if (end == std::string::npos) end = labels.size();
+            if (labels.substr(start, end - start) == edit.from) {
+                if (!edit.to.empty()) {
+                labels.replace(start, end - start, edit.to);
+                } else if (end < labels.size()) {
+                labels.erase(start, end - start + 1);
+                } else if (start > 0) {
+                labels.erase(start - 1);
+                } else {
+                labels.clear(); 
+                }
+                break; 
+            }
+            if (end == labels.size()) break; // 已经检查完最后一个字段。
+            start = end + 1; // 跳过逗号，继续检查下一个字段。
         }
-        continue;
-    }   
- }
+    }
+    return labels; // labels 是值传递的副本，不会修改调用方的字符串。
+}
+ 
 // END IMPLEMENTATION
 }
 
